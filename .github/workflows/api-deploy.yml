@@ -1,0 +1,61 @@
+name: Deploy API
+
+on:
+  workflow_run:
+    workflows: ["Build and Push API"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: 'latest'
+
+jobs:
+  deploy:
+    name: Deploy to App Server
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.APP_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Copy deployment files
+        run: |
+          scp -r deployment/app/* root@${{ secrets.APP_SERVER_IP }}:/opt/price-tracker/
+
+      - name: Deploy
+        run: |
+          ssh root@${{ secrets.APP_SERVER_IP }} << 'EOF'
+            cd /opt/price-tracker
+
+            cat > .env << 'ENVEOF'
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.APP_TUNNEL_TOKEN }}
+          GITHUB_REPOSITORY=${{ github.repository }}
+          IMAGE_TAG=${{ github.event.inputs.image_tag || 'latest' }}
+          ENVEOF
+
+            mkdir -p frontend
+
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            docker compose pull
+            docker compose up -d
+
+            docker image prune -f
+
+            sleep 30
+            curl -f http://localhost/health || exit 1
+          EOF

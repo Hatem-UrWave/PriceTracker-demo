@@ -1,0 +1,37 @@
+name: Deploy Frontend
+
+on:
+  workflow_run:
+    workflows: ["Build Frontend"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to App Server
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    environment: production
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.APP_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh root@${{ secrets.APP_SERVER_IP }} "mkdir -p /opt/price-tracker/frontend"
+          rsync -avz --delete dist/ root@${{ secrets.APP_SERVER_IP }}:/opt/price-tracker/frontend/
+          ssh root@${{ secrets.APP_SERVER_IP }} "docker exec price-tracker-nginx nginx -s reload"

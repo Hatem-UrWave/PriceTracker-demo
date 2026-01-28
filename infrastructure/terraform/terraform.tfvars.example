@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in your values
+# DO NOT commit terraform.tfvars to version control
+
+# Hetzner Cloud Configuration
+hetzner_api_token    = "your-hetzner-api-token"
+hetzner_project_name = "Price Tracker"
+
+# Cloudflare Configuration
+cloudflare_api_token  = "your-cloudflare-api-token"
+cloudflare_account_id = "your-cloudflare-account-id"
+cloudflare_zone_id    = "your-cloudflare-zone-id-for-urwave.dev"
+
+# Domain Configuration
+domain               = "urwave.dev"
+app_subdomain        = "tracker"
+management_subdomain = "mgmt"
+
+# Server Configuration
+server_location = "nbg1"        # Nuremberg datacenter
+server_type     = "cx23"        # 2 vCPU, 4GB RAM, 40GB SSD
+
+# SSH Configuration
+ssh_public_key = "ssh-ed25519 AAAA... your-public-key-here"
+
+# Access Control
+admin_email = "your-email@example.com"
