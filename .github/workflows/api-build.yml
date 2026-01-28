@@ -13,7 +13,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/price-tracker-api
+  # Must be lowercase for Docker/GHCR
+  IMAGE_NAME: ${{ github.repository_owner }}/pricetracker-demo/price-tracker-api
 
 jobs:
   build:

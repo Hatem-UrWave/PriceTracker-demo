@@ -36,14 +36,17 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh root@${{ secrets.APP_SERVER_IP }} << 'EOF'
+          # Convert repository name to lowercase for Docker/GHCR
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
+          ssh root@${{ secrets.APP_SERVER_IP }} << EOF
             cd /opt/price-tracker
 
-            cat > .env << 'ENVEOF'
+            cat > .env << ENVEOF
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.APP_TUNNEL_TOKEN }}
-          GITHUB_REPOSITORY=${{ github.repository }}
+          GITHUB_REPOSITORY=${REPO_LOWER}
           IMAGE_TAG=${{ github.event.inputs.image_tag || 'latest' }}
           ENVEOF
 
