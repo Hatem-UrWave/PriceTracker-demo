@@ -2,159 +2,254 @@
 
 A complete full-stack application for tracking cryptocurrency, stock, and forex prices with real-time alerts.
 
-## 🚀 Tech Stack
+## Live URLs
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Application** | https://tracker.urwave.dev | Angular frontend |
+| **API** | https://tracker.urwave.dev/api | .NET REST API |
+| **API Docs** | https://tracker.urwave.dev/openapi/v1.json | OpenAPI specification |
+| **Hangfire** | https://tracker.urwave.dev/hangfire | Background jobs dashboard |
+| **Grafana** | https://mgmt.urwave.dev/grafana | Metrics & logs visualization |
+| **Prometheus** | https://mgmt.urwave.dev/prometheus | Metrics collection |
+| **Portainer** | https://mgmt.urwave.dev/portainer | Container management |
+| **Uptime Kuma** | https://mgmt.urwave.dev/status | Uptime monitoring |
+
+## Tech Stack
 
 ### Frontend
-- **Angular 21** - Modern TypeScript framework with standalone components
+- **Angular 19** - Modern TypeScript framework with standalone components
 - **Tailwind CSS 3.4** - Utility-first CSS framework
 - **ng2-charts** - Beautiful charts powered by Chart.js
 
 ### Backend
-- **.NET 10** - Latest .NET with minimal APIs
+- **.NET 8** - Minimal APIs with Entity Framework Core
 - **PostgreSQL 16** - Relational database
-- **Redis 7** - Caching and session management
-- **Hangfire** - Background job processing
+- **Redis 7** - Caching layer
+- **Hangfire** - Background job processing with PostgreSQL storage
 
 ### Infrastructure
-- **Hetzner Cloud** - 2x CX23 servers (Nuremberg datacenter)
-- **Cloudflare Zero Trust** - Tunnels, DNS, and access control
+- **Hetzner Cloud** - 2x CX22 servers (Nuremberg datacenter)
+  - App Server: `46.225.56.58`
+  - Management Server: `46.225.50.149`
+- **Cloudflare Zero Trust** - Tunnels for secure access (no exposed ports)
 - **Terraform** - Infrastructure as Code
 - **Docker & Docker Compose** - Containerization
-- **Nginx** - Reverse proxy and static file serving
+- **Nginx** - Reverse proxy
 
-### Monitoring
+### Monitoring Stack
 - **Prometheus** - Metrics collection
-- **Grafana** - Metrics visualization
-- **Portainer** - Container management
-- **Uptime Kuma** - Uptime monitoring
+- **Grafana** - Metrics & logs visualization
 - **Loki + Promtail** - Log aggregation
+- **Portainer** - Container management UI
+- **Uptime Kuma** - Uptime monitoring
 
-## 📋 Features
+### CI/CD
+- **GitHub Actions** - Automated build and deployment
+- **GitHub Container Registry (ghcr.io)** - Docker image storage
 
-- Real-time price tracking for cryptocurrencies, stocks, and forex
-- Price alerts with webhook notifications
-- RESTful API with Swagger documentation
-- Hangfire dashboard for job monitoring
-- Responsive Angular SPA
-- Redis caching for improved performance
-- Prometheus metrics endpoint
-- Health check endpoints
+## Docker Registry
 
-## 🏗️ Architecture
+Images are stored in GitHub Container Registry:
 
 ```
-┌─────────────────────────────────────────┐
-│       Cloudflare Zero Trust            │
-│   tracker.urwave.dev | mgmt.urwave.dev  │
-└──────────┬──────────────┬───────────────┘
-           │              │
-    ┌──────▼────────┐  ┌──▼─────────────┐
-    │  App Server   │  │  Mgmt Server   │
-    │  (CX23)       │  │  (CX23)        │
-    │               │  │                │
-    │  ┌─────────┐  │  │  ┌──────────┐ │
-    │  │  Nginx  │  │  │  │ Portainer│ │
-    │  └────┬────┘  │  │  │ Grafana  │ │
-    │       │       │  │  │Prometheus│ │
-    │  ┌────▼────┐  │  │  │  Loki    │ │
-    │  │ .NET API│  │  │  └──────────┘ │
-    │  └─┬───┬───┘  │  └────────────────┘
-    │    │   │      │
-    │  ┌─▼┐ ┌▼───┐  │
-    │  │PG│ │Redis│ │
-    │  └──┘ └────┘  │
-    └────────────────┘
+ghcr.io/hatem-urwave/pricetracker-demo/price-tracker-api:latest
 ```
 
-## 🚦 Getting Started
+View packages: https://github.com/Hatem-UrWave/PriceTracker-demo/pkgs/container/pricetracker-demo%2Fprice-tracker-api
 
-### Prerequisites
+## Architecture
 
-- Node.js 22+
-- .NET 10 SDK
-- Docker & Docker Compose
-- Terraform
-- GitHub account
-- Hetzner Cloud account
-- Cloudflare account
+```
+                    ┌─────────────────────────────────────────┐
+                    │         Cloudflare Zero Trust           │
+                    │  tracker.urwave.dev │ mgmt.urwave.dev   │
+                    └──────────┬──────────────┬───────────────┘
+                               │              │
+                    ┌──────────▼────────┐  ┌──▼─────────────────┐
+                    │    App Server     │  │   Mgmt Server      │
+                    │   46.225.56.58    │  │   46.225.50.149    │
+                    │                   │  │                    │
+                    │  ┌─────────────┐  │  │  ┌──────────────┐  │
+                    │  │    Nginx    │  │  │  │    Nginx     │  │
+                    │  └──────┬──────┘  │  │  └──────┬───────┘  │
+                    │         │         │  │         │          │
+                    │  ┌──────▼──────┐  │  │  ┌──────▼───────┐  │
+                    │  │  .NET API   │  │  │  │  Portainer   │  │
+                    │  │  (Hangfire) │  │  │  │  Grafana     │  │
+                    │  └──┬──────┬───┘  │  │  │  Prometheus  │  │
+                    │     │      │      │  │  │  Loki        │  │
+                    │  ┌──▼──┐ ┌─▼───┐  │  │  │  Uptime Kuma │  │
+                    │  │ PG  │ │Redis│  │  │  │  Promtail    │  │
+                    │  └─────┘ └─────┘  │  │  └──────────────┘  │
+                    │                   │  │                    │
+                    │  ┌─────────────┐  │  │  ┌──────────────┐  │
+                    │  │ cloudflared │  │  │  │ cloudflared  │  │
+                    │  └─────────────┘  │  │  └──────────────┘  │
+                    └───────────────────┘  └────────────────────┘
+```
 
-### Local Development
+## Terraform Infrastructure
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Hatem-UrWave/PriceTracker-demo.git
-   cd PriceTracker-demo
-   ```
+All infrastructure is managed via Terraform in `infrastructure/terraform/`.
 
-2. **Start the API**
-   ```bash
-   cd src/api
-   dotnet restore
-   dotnet run
-   ```
+### Providers
 
-3. **Start the Frontend**
-   ```bash
-   cd src/frontend
-   npm install
-   npm start
-   ```
+| Provider | Version | Purpose |
+|----------|---------|---------|
+| `hetznercloud/hcloud` | ~> 1.45 | Hetzner Cloud resources |
+| `cloudflare/cloudflare` | ~> 4.0 | Cloudflare DNS & Tunnels |
 
-   The frontend will be available at `http://localhost:4200`
-   The API will be available at `http://localhost:5000`
+### Resources Created
 
-### Production Deployment
+#### Hetzner Cloud
 
-1. **Configure Terraform**
-   ```bash
-   cd infrastructure/terraform
-   cp terraform.tfvars.example terraform.tfvars
-   # Edit terraform.tfvars with your values
-   ```
+| Resource | Name | Description |
+|----------|------|-------------|
+| **Server** | `price-tracker-app` | Application server (CX22, Ubuntu 24.04) |
+| **Server** | `price-tracker-mgmt` | Management server (CX22, Ubuntu 24.04) |
+| **Network** | `price-tracker-network` | Private network (10.0.0.0/16) |
+| **Subnet** | - | Cloud subnet (10.0.1.0/24, eu-central) |
+| **Firewall** | `price-tracker-app-firewall` | App server firewall (SSH, HTTP, HTTPS, ICMP) |
+| **Firewall** | `price-tracker-mgmt-firewall` | Mgmt server firewall (SSH, HTTP, HTTPS, ICMP) |
+| **SSH Key** | `price-tracker-deploy` | SSH key for server access |
 
-2. **Deploy Infrastructure**
-   ```bash
-   terraform init
-   terraform plan
-   terraform apply
-   ```
+#### Cloudflare
 
-3. **Configure GitHub Secrets**
-   Add the following secrets to your GitHub repository:
-   - `HETZNER_API_TOKEN`
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`
-   - `CLOUDFLARE_ZONE_ID`
-   - `SSH_PRIVATE_KEY`
-   - `SSH_PUBLIC_KEY`
-   - `APP_SERVER_IP`
-   - `DB_PASSWORD`
-   - `REDIS_PASSWORD`
-   - `APP_TUNNEL_TOKEN`
-   - `ADMIN_EMAIL`
+| Resource | Name | Description |
+|----------|------|-------------|
+| **Tunnel** | `price-tracker-app` | Tunnel for tracker.urwave.dev |
+| **Tunnel** | `price-tracker-management` | Tunnel for mgmt.urwave.dev |
+| **DNS Record** | `tracker` | CNAME pointing to app tunnel |
+| **DNS Record** | `mgmt` | CNAME pointing to management tunnel |
+| **Access App** | `Price Tracker Management` | Zero Trust access for mgmt subdomain |
+| **Access Policy** | `Management Access Policy` | Email-based access control |
 
-4. **Deploy Application**
-   Push to main branch to trigger GitHub Actions workflows:
-   - API build and deployment
-   - Frontend build and deployment
+### Server Configuration
 
-## 📊 Monitoring
+Both servers are provisioned with:
+- Ubuntu 24.04 LTS
+- Docker & Docker Compose plugin
+- Application directory (`/opt/price-tracker` or `/opt/management`)
+- Useful bash aliases (`dc`, `dps`, `dlogs`)
 
-- **Application**: https://tracker.urwave.dev
-- **API Docs**: https://tracker.urwave.dev/swagger
-- **Hangfire**: https://tracker.urwave.dev/hangfire
-- **Management**: https://mgmt.urwave.dev
+### Private Network
 
-## 💰 Cost Breakdown
+```
+Network: 10.0.0.0/16
+Subnet:  10.0.1.0/24 (eu-central)
 
-| Resource | Monthly Cost |
-|----------|--------------|
-| Hetzner CX23 × 2 | ~€8.70 |
-| Cloudflare (Free) | €0 |
-| GitHub Actions (Free) | €0 |
-| **Total** | **~€8.70/month** |
+App Server:        10.0.1.10
+Management Server: 10.0.1.20
+```
 
-## 📝 API Endpoints
+### Terraform Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `hetzner_api_token` | - | Hetzner Cloud API token (sensitive) |
+| `cloudflare_api_token` | - | Cloudflare API token (sensitive) |
+| `cloudflare_account_id` | - | Cloudflare account ID |
+| `cloudflare_zone_id` | - | Cloudflare zone ID |
+| `domain` | `urwave.dev` | Base domain |
+| `app_subdomain` | `tracker` | Application subdomain |
+| `management_subdomain` | `mgmt` | Management subdomain |
+| `server_location` | `nbg1` | Hetzner datacenter (Nuremberg) |
+| `server_type` | `cx22` | Server type (2 vCPU, 4GB RAM) |
+| `ssh_public_key` | - | SSH public key for access |
+| `admin_email` | - | Email for Cloudflare Access |
+
+### Terraform Outputs
+
+| Output | Description |
+|--------|-------------|
+| `app_server_ip` | Application server public IP |
+| `management_server_ip` | Management server public IP |
+| `app_tunnel_token` | Cloudflare tunnel token for app (sensitive) |
+| `management_tunnel_token` | Cloudflare tunnel token for mgmt (sensitive) |
+| `app_url` | Application URL (https://tracker.urwave.dev) |
+| `management_url` | Management URL (https://mgmt.urwave.dev) |
+
+### Terraform Commands
+
+```bash
+cd infrastructure/terraform
+
+# Initialize
+terraform init
+
+# Preview changes
+terraform plan
+
+# Apply changes
+terraform apply
+
+# Get outputs
+terraform output
+
+# Get sensitive outputs
+terraform output -json app_tunnel_token
+```
+
+### Terraform Files
+
+```
+infrastructure/terraform/
+├── main.tf                 # Provider configuration
+├── variables.tf            # Input variables
+├── outputs.tf              # Output values
+├── locals.tf               # Local values
+├── hetzner-servers.tf      # Server resources
+├── hetzner-network.tf      # Network & firewall
+├── hetzner-ssh.tf          # SSH key
+├── cloudflare-tunnels.tf   # Cloudflare tunnels
+├── cloudflare-dns.tf       # DNS records
+└── cloudflare-access.tf    # Zero Trust access
+```
+
+## GitHub Secrets Required
+
+### Infrastructure Secrets
+| Secret | Description |
+|--------|-------------|
+| `HETZNER_API_TOKEN` | Hetzner Cloud API token |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
+| `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID for urwave.dev |
+
+### SSH Access
+| Secret | Description |
+|--------|-------------|
+| `SSH_PRIVATE_KEY` | SSH private key for deployment |
+
+### App Server Secrets
+| Secret | Description |
+|--------|-------------|
+| `APP_SERVER_IP` | App server IP (46.225.56.58) |
+| `DB_PASSWORD` | PostgreSQL password |
+| `REDIS_PASSWORD` | Redis password |
+| `APP_TUNNEL_TOKEN` | Cloudflare tunnel token for app |
+
+### Management Server Secrets
+| Secret | Description |
+|--------|-------------|
+| `MGMT_SERVER_IP` | Management server IP (46.225.50.149) |
+| `MGMT_TUNNEL_TOKEN` | Cloudflare tunnel token for management |
+| `GRAFANA_PASSWORD` | Grafana admin password |
+| `PORTAINER_PASSWORD` | Portainer admin password (optional) |
+
+## GitHub Actions Workflows
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `api-build.yml` | Push to `src/api/**` | Build and push API Docker image |
+| `api-deploy.yml` | Manual / After build | Deploy API to app server |
+| `frontend-build.yml` | Push to `src/frontend/**` | Build Angular app |
+| `frontend-deploy.yml` | Manual / After build | Deploy frontend to app server |
+| `management-deploy.yml` | Manual | Deploy management stack |
+| `infrastructure.yml` | Push to `infrastructure/**` | Apply Terraform changes |
+
+## API Endpoints
 
 ### Cryptocurrency
 - `GET /api/crypto` - Get all cryptocurrencies
@@ -174,40 +269,164 @@ A complete full-stack application for tracking cryptocurrency, stock, and forex 
 - `POST /api/alerts` - Create new alert
 - `DELETE /api/alerts/{id}` - Delete alert
 
-## 🔒 Security
+### Health & Metrics
+- `GET /health` - Health check
+- `GET /health/ready` - Readiness check
+- `GET /health/live` - Liveness check
+- `GET /metrics` - Prometheus metrics
 
-- Cloudflare Zero Trust for secure access
-- Environment variables for sensitive data
-- Docker secrets management
-- Firewall rules on Hetzner servers
-- HTTPS via Cloudflare
+## Local Development
 
-## 📚 Documentation
+### Prerequisites
+- Node.js 22+
+- .NET 8 SDK
+- Docker & Docker Compose
+- PostgreSQL 16 (or use Docker)
+- Redis 7 (or use Docker)
 
-- [Setup Guide](docs/SETUP.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Runbook](docs/RUNBOOK.md)
+### Run with Docker Compose
 
-## 🤝 Contributing
+```bash
+cd deployment/app
+docker compose up -d
+```
 
-This is a learning project. Feel free to fork and experiment!
+### Run Locally
 
-## 📄 License
+1. **Start the API**
+   ```bash
+   cd src/api
+   dotnet restore
+   dotnet run
+   ```
+
+2. **Start the Frontend**
+   ```bash
+   cd src/frontend
+   npm install
+   npm start
+   ```
+
+   - Frontend: http://localhost:4200
+   - API: http://localhost:5000
+
+## Monitoring Access
+
+### Grafana
+- URL: https://mgmt.urwave.dev/grafana
+- Username: `admin`
+- Password: Set via `GRAFANA_PASSWORD` secret
+
+**Pre-configured Data Sources:**
+- Prometheus (metrics)
+- Loki (logs)
+
+**Useful Dashboard IDs to Import:**
+- `1860` - Node Exporter Full
+- `3662` - Prometheus Stats
+- `13639` - Loki Logs
+
+### Portainer
+- URL: https://mgmt.urwave.dev/portainer
+- Create admin account on first access
+
+### Prometheus
+- URL: https://mgmt.urwave.dev/prometheus
+- Direct access to PromQL queries
+
+### Uptime Kuma
+- URL: https://mgmt.urwave.dev/status
+- Create admin account on first access
+
+## Server Access
+
+```bash
+# App Server
+ssh -i ~/.ssh/price-tracker-deploy root@46.225.56.58
+
+# Management Server
+ssh -i ~/.ssh/price-tracker-deploy root@46.225.50.149
+```
+
+### Useful Commands
+
+```bash
+# View running containers
+docker ps
+
+# View logs
+docker logs price-tracker-api --tail 100 -f
+
+# Restart a service
+cd /opt/price-tracker && docker compose restart api
+
+# View database
+docker exec -it price-tracker-db psql -U postgres -d pricetracker
+```
+
+## Cost Breakdown
+
+| Resource | Monthly Cost |
+|----------|--------------|
+| Hetzner CX22 x 2 | ~€9.00 |
+| Cloudflare (Free) | €0 |
+| GitHub Actions (Free) | €0 |
+| **Total** | **~€9.00/month** |
+
+## Security
+
+- **No exposed ports** - All traffic goes through Cloudflare Tunnels
+- **Cloudflare Zero Trust** - Secure access without VPN
+- **Environment variables** - Secrets managed via GitHub Secrets
+- **Docker networks** - Isolated container networking
+- **HTTPS everywhere** - SSL termination at Cloudflare
+
+## Project Structure
+
+```
+PriceTracker-demo/
+├── .github/
+│   └── workflows/           # GitHub Actions CI/CD
+├── deployment/
+│   ├── app/                 # App server Docker Compose
+│   └── management/          # Management server Docker Compose
+├── infrastructure/
+│   └── terraform/           # Terraform IaC
+├── src/
+│   ├── api/                 # .NET 8 API
+│   └── frontend/            # Angular 19 SPA
+└── README.md
+```
+
+## Troubleshooting
+
+### API Returns 500 Error
+Check database tables exist:
+```bash
+docker exec price-tracker-db psql -U postgres -d pricetracker -c '\dt'
+```
+
+### Container Won't Start
+Check logs:
+```bash
+docker logs <container-name> --tail 50
+```
+
+### Cloudflare Tunnel Issues
+Verify tunnel is running:
+```bash
+docker logs cloudflared-app --tail 20
+```
+
+## License
 
 MIT License - See LICENSE file for details
 
-## 🙏 Acknowledgments
-
-Built for learning DevOps practices including:
-- Infrastructure as Code
-- CI/CD pipelines
-- Container orchestration
-- Monitoring and observability
-- Cloud deployments
-
 ---
 
-**Project**: Price Tracker
-**Hetzner Project**: Price Tracker
-**Server Type**: CX23 (2 vCPU, 4GB RAM, 40GB SSD)
-**Location**: Nuremberg (nbg1)# Deployment triggered
+**Built for learning DevOps practices including:**
+- Infrastructure as Code (Terraform)
+- CI/CD pipelines (GitHub Actions)
+- Container orchestration (Docker Compose)
+- Monitoring and observability (Prometheus, Grafana, Loki)
+- Secure cloud deployments (Cloudflare Zero Trust)

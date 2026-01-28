@@ -6,7 +6,12 @@
       "Bash(git push:*)",
       "Bash(git rm:*)",
       "Bash(npm install:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(ssh-keyscan:*)",
+      "Bash(~/.ssh/known_hosts)",
+      "Bash(curl:*)"
     ]
   }
 }

@@ -29,7 +29,6 @@ services:
       - portainer-data:/data
     networks:
       - mgmt-network
-    command: --admin-password='${PORTAINER_PASSWORD}'
 
   prometheus:
     image: prom/prometheus:latest
@@ -42,6 +41,8 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=30d'
+      - '--web.external-url=https://mgmt.urwave.dev/prometheus/'
+      - '--web.route-prefix=/'
     networks:
       - mgmt-network
 
