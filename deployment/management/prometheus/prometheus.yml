@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter-app'
+    static_configs:
+      - targets: ['APP_SERVER_IP:9100']
+        labels:
+          instance: 'app-server'
+
+  - job_name: 'price-tracker-api'
+    static_configs:
+      - targets: ['APP_SERVER_IP:80']
+        labels:
+          service: 'api'
+    metrics_path: '/metrics'
