@@ -112,6 +112,8 @@ app.MapOpenApi();
 
 app.UseSerilogRequestLogging();
 
+
+
 app.UseCors();
 
 // Prometheus metrics endpoint
