@@ -15,19 +15,6 @@ A complete full-stack application for tracking cryptocurrency, stock, and forex 
 | **Portainer** | https://mgmt.urwave.dev/portainer | Container management |
 | **Uptime Kuma** | https://mgmt.urwave.dev/status | Uptime monitoring |
 
-## Tech Stack
-
-### Frontend
-- **Angular 19** - Modern TypeScript framework with standalone components
-- **Tailwind CSS 3.4** - Utility-first CSS framework
-- **ng2-charts** - Beautiful charts powered by Chart.js
-
-### Backend
-- **.NET 8** - Minimal APIs with Entity Framework Core
-- **PostgreSQL 16** - Relational database
-- **Redis 7** - Caching layer
-- **Hangfire** - Background job processing with PostgreSQL storage
-
 ### Infrastructure
 - **Hetzner Cloud** - 2x CX22 servers (Nuremberg datacenter)
   - App Server: `46.225.56.58`
