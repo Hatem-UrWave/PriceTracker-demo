@@ -3,6 +3,6 @@ resource "hcloud_ssh_key" "default" {
   public_key = var.ssh_public_key
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
   }
 }

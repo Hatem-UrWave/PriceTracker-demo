@@ -7,7 +7,7 @@ resource "hcloud_server" "app" {
   ssh_keys = [hcloud_ssh_key.default.id]
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
     role    = "application"
   }
 
@@ -59,7 +59,7 @@ resource "hcloud_server" "management" {
   ssh_keys = [hcloud_ssh_key.default.id]
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
     role    = "management"
   }
 

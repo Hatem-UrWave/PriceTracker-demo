@@ -3,7 +3,7 @@ resource "hcloud_network" "main" {
   ip_range = "10.0.0.0/16"
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
   }
 }
 
@@ -18,7 +18,7 @@ resource "hcloud_firewall" "app_server" {
   name = "price-tracker-app-firewall"
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
   }
 
   # SSH
@@ -69,7 +69,7 @@ resource "hcloud_firewall" "management_server" {
   name = "price-tracker-mgmt-firewall"
 
   labels = {
-    project = var.hetzner_project_name
+    project = local.project_label
   }
 
   # SSH
