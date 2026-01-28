@@ -12,9 +12,6 @@
     <!-- ASP.NET Core -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.*" />
 
-    <!-- Swagger/OpenAPI -->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.*" />
-
     <!-- Entity Framework Core -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.*">
@@ -39,7 +36,7 @@
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.*" />
 
     <!-- Health Checks -->
-    <PackageReference Include="AspNetCore.HealthChecks.Npgsql" Version="10.0.*" />
+    <PackageReference Include="AspNetCore.HealthChecks.Npgsql" Version="9.0.*" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.*" />
     <PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="9.0.*" />
 

@@ -23,20 +23,7 @@ builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new()
-    {
-        Title = "Price Tracker API",
-        Version = "v1",
-        Description = "Real-time price tracking for crypto, stocks, and forex",
-        Contact = new()
-        {
-            Name = "Price Tracker Team",
-            Url = new Uri("https://tracker.urwave.dev")
-        }
-    });
-});
+builder.Services.AddOpenApi();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -121,25 +108,7 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Price Tracker API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
-else
-{
-    // Enable Swagger in production too for documentation
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Price Tracker API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
+app.MapOpenApi();
 
 app.UseSerilogRequestLogging();
 
