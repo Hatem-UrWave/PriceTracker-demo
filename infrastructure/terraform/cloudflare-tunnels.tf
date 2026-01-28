@@ -40,7 +40,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "management" {
   config {
     ingress_rule {
       hostname = "${var.management_subdomain}.${var.domain}"
-      service  = "http://localhost:80"
+      service  = "http://nginx:80"
     }
     ingress_rule {
       service = "http_status:404"
