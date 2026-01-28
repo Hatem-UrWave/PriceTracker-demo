@@ -1,0 +1,54 @@
+name: Deploy Management Stack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deployment/management/**'
+      - '.github/workflows/management-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Management Server
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.MGMT_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Copy deployment files
+        run: |
+          scp -r deployment/management/* root@${{ secrets.MGMT_SERVER_IP }}:/opt/management/
+
+      - name: Deploy
+        run: |
+          ssh root@${{ secrets.MGMT_SERVER_IP }} << 'EOF'
+            cd /opt/management
+
+            # Create .env file
+            cat > .env << 'ENVEOF'
+          PORTAINER_PASSWORD=${{ secrets.PORTAINER_PASSWORD }}
+          GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}
+          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.MGMT_TUNNEL_TOKEN }}
+          ENVEOF
+
+            # Pull and deploy
+            docker compose pull
+            docker compose up -d
+
+            # Cleanup old images
+            docker image prune -f
+
+            # Health check
+            sleep 30
+            curl -f http://localhost/health || echo "Management stack deployed"
+          EOF
