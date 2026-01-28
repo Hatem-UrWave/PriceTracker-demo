@@ -9,6 +9,7 @@ on:
   pull_request:
     paths:
       - 'src/api/**'
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
