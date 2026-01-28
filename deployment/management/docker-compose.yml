@@ -52,8 +52,10 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
       - GF_INSTALL_PLUGINS=grafana-clock-panel
-      - GF_SERVER_ROOT_URL=https://mgmt.urwave.dev/grafana/
+      - GF_SERVER_DOMAIN=mgmt.urwave.dev
+      - GF_SERVER_ROOT_URL=https://mgmt.urwave.dev/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ENFORCE_DOMAIN=false
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
