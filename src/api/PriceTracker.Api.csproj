@@ -40,13 +40,13 @@
 
     <!-- Health Checks -->
     <PackageReference Include="AspNetCore.HealthChecks.Npgsql" Version="10.0.*" />
-    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="10.0.*" />
-    <PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="10.0.*" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.*" />
+    <PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="9.0.*" />
 
     <!-- Logging -->
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.*" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.1.*" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.*" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.*" />
 
     <!-- Validation -->
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.*" />
