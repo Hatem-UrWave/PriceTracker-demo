@@ -1,10 +1,10 @@
-resource "cloudflare_tunnel" "app" {
+resource "cloudflare_zero_trust_tunnel_cloudflared" "app" {
   account_id = var.cloudflare_account_id
   name       = "price-tracker-app"
   secret     = random_id.tunnel_secret_app.b64_std
 }
 
-resource "cloudflare_tunnel" "management" {
+resource "cloudflare_zero_trust_tunnel_cloudflared" "management" {
   account_id = var.cloudflare_account_id
   name       = "price-tracker-management"
   secret     = random_id.tunnel_secret_management.b64_std
@@ -18,9 +18,9 @@ resource "random_id" "tunnel_secret_management" {
   byte_length = 32
 }
 
-resource "cloudflare_tunnel_config" "app" {
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "app" {
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_tunnel.app.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.app.id
 
   config {
     ingress_rule {
@@ -33,9 +33,9 @@ resource "cloudflare_tunnel_config" "app" {
   }
 }
 
-resource "cloudflare_tunnel_config" "management" {
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "management" {
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_tunnel.management.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.management.id
 
   config {
     ingress_rule {

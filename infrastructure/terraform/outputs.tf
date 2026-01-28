@@ -10,13 +10,13 @@ output "management_server_ip" {
 
 output "app_tunnel_token" {
   description = "Cloudflare Tunnel token for app server"
-  value       = cloudflare_tunnel.app.tunnel_token
+  value       = cloudflare_zero_trust_tunnel_cloudflared.app.tunnel_token
   sensitive   = true
 }
 
 output "management_tunnel_token" {
   description = "Cloudflare Tunnel token for management server"
-  value       = cloudflare_tunnel.management.tunnel_token
+  value       = cloudflare_zero_trust_tunnel_cloudflared.management.tunnel_token
   sensitive   = true
 }
 
