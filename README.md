@@ -210,4 +210,4 @@ Built for learning DevOps practices including:
 **Project**: Price Tracker
 **Hetzner Project**: Price Tracker
 **Server Type**: CX23 (2 vCPU, 4GB RAM, 40GB SSD)
-**Location**: Nuremberg (nbg1)
+**Location**: Nuremberg (nbg1)# Deployment triggered
